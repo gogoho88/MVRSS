@@ -1,6 +1,7 @@
 """Class to train a PyTorch model"""
 import os
 import json
+import time
 import numpy as np
 import torch
 import torch.nn as nn
@@ -184,7 +185,7 @@ class Model(nn.Module):
                         running_losses = list()
                         rd_running_losses = list()
                         ra_running_losses = list()
-                        self.visualizer.update_learning_rate(scheduler.get_lr()[0], iteration)
+                        self.visualizer.update_learning_rate(scheduler.get_last_lr()[0], iteration)
 
                     if iteration % self.val_step == 0 and iteration > 0:
                         if iteration % self.viz_step == 0 and iteration > 0:

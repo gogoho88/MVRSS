@@ -1,5 +1,6 @@
 """Classes to load Carrada dataset"""
 import os
+import time
 import numpy as np
 from skimage import transform
 from pathlib import Path
@@ -137,7 +138,6 @@ class CarradaDataset(Dataset):
             rd_matrices.append(rd_matrix)
             ra_matrices.append(ra_matrix)
             ad_matrices.append(ad_matrix)
-
         # Apply the same transfo to all representations
         if np.random.uniform(0, 1) > 0.5:
             is_vflip = True
@@ -188,7 +188,6 @@ class CarradaDataset(Dataset):
         frame = {'rd_matrix': rd_frame['matrix'], 'rd_mask': rd_frame['mask'],
                  'ra_matrix': ra_frame['matrix'], 'ra_mask': ra_frame['mask'],
                  'ad_matrix': ad_frame['matrix']}
-
         return frame
 
 

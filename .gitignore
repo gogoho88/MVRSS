@@ -109,3 +109,6 @@ venv.bak/
 
 # Python Kernprof profiling
 .lprof
+
+# log
+/logs
