@@ -111,42 +111,38 @@ def normalize(data, signal_type, norm_type='local'):
         norm_data = torch.div(torch.sub(data, min_value), torch.sub(max_value, min_value))
         return norm_data
 
-    elif signal_type == 'range_doppler':
-        if norm_type == 'tvt':
-            file_path = MVRSS_HOME / 'config_files' / 'rd_stats_all.json'
-        else:
-            raise TypeError('Global type {} is not supported'.format(norm_type))
+    elif 'mod' in norm_type:
+        file_path = MVRSS_HOME / 'config_files' / 'all_stats.json'
         with open(file_path, 'r') as fp:
-            rd_stats = json.load(fp)
-        min_value = torch.tensor(rd_stats['min_val'])
-        max_value = torch.tensor(rd_stats['max_val'])
-
-    elif signal_type == 'range_angle':
-        if norm_type == 'tvt':
-            file_path = MVRSS_HOME / 'config_files' / 'ra_stats_all.json'
-        else:
-            raise TypeError('Global type {} is not supported'.format(norm_type))
-        with open(file_path, 'r') as fp:
-            ra_stats = json.load(fp)
-        min_value = torch.tensor(ra_stats['min_val'])
-        max_value = torch.tensor(ra_stats['max_val'])
-
-    elif signal_type == 'angle_doppler':
-        if norm_type == 'tvt':
-            file_path = MVRSS_HOME / 'config_files' / 'ad_stats_all.json'
-        else:
-            raise TypeError('Global type {} is not supported'.format(norm_type))
-        with open(file_path, 'r') as fp:
-            ad_stats = json.load(fp)
-        min_value = torch.tensor(ad_stats['min_val'])
-        max_value = torch.tensor(ad_stats['max_val'])
-
-    else:
-        raise TypeError('Signal {} is not supported.'.format(signal_type))
-
-    norm_data = torch.div(torch.sub(data, min_value),
-                          torch.sub(max_value, min_value))
-    return norm_data
+            stats = json.load(fp)
+        if 'Znorm' in norm_type:
+            if signal_type == 'range_doppler':
+                mean_value = torch.tensor(stats['rd_stats_preprocessd']['mean'])
+                std_value = torch.tensor(stats['rd_stats_preprocessd']['std'])
+            elif signal_type == 'range_angle':
+                mean_value = torch.tensor(stats['ra_stats_preprocessd']['mean'])
+                std_value = torch.tensor(stats['ra_stats_preprocessd']['std'])
+            elif signal_type == 'angle_doppler':
+                mean_value = torch.tensor(stats['ad_stats_preprocessd']['mean'])
+                std_value = torch.tensor(stats['ad_stats_preprocessd']['std'])
+            else:
+                raise TypeError('Signal {} is not supported.'.format(signal_type))
+            norm_data = torch.div(torch.sub(data, mean_value),std_value)
+        elif 'minmax' in norm_type:
+            if signal_type == 'range_doppler':
+                min_value = torch.tensor(stats['rd_stats_preprocessd']['min_val'])
+                max_value = torch.tensor(stats['rd_stats_preprocessd']['max_val'])
+            elif signal_type == 'range_angle':
+                min_value = torch.tensor(stats['ra_stats_preprocessd']['min_val'])
+                max_value = torch.tensor(stats['ra_stats_preprocessd']['max_val'])
+            elif signal_type == 'angle_doppler':
+                min_value = torch.tensor(stats['ad_stats_preprocessd']['min_val'])
+                max_value = torch.tensor(stats['ad_stats_preprocessd']['max_val'])
+            else:
+                raise TypeError('Signal {} is not supported.'.format(signal_type))
+            norm_data = torch.div(torch.sub(data, min_value),
+                            torch.sub(max_value, min_value))
+        return norm_data
 
 
 def define_loss(signal_type, custom_loss, device):
