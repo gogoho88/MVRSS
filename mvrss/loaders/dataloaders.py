@@ -61,7 +61,7 @@ class CarradaDataset(Dataset):
         self.n_frame_stride = n_frame_stride
         self.transformations = transformations
         self.add_temp = add_temp
-        self.dataset = self.dataset[(self.n_frames-1)*self.n_frame_stride:]  # remove n*stride first frames
+        self.dataset = self.dataset[(self.n_frames-1)*self.n_frame_stride::self.n_frame_stride]  # remove n*stride first frames
         self.path_to_annots = self.path_to_frames / 'annotations' / self.annotation_type
 
     def transform(self, frame, is_vflip=False, is_hflip=False):
