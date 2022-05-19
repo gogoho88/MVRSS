@@ -52,15 +52,16 @@ class CarradaDataset(Dataset):
     """
 
     def __init__(self, dataset, annotation_type, path_to_frames, process_signal,
-                 n_frames, transformations=None, add_temp=False):
+                 n_frames, transformations=None, add_temp=False, n_frame_stride=1):
         self.dataset = dataset
         self.annotation_type = annotation_type
         self.path_to_frames = Path(path_to_frames)
         self.process_signal = process_signal
         self.n_frames = n_frames
+        self.n_frame_stride = n_frame_stride
         self.transformations = transformations
         self.add_temp = add_temp
-        self.dataset = self.dataset[self.n_frames-1:]  # remove n first frames
+        self.dataset = self.dataset[(self.n_frames-1)*self.n_frame_stride:]  # remove n*stride first frames
         self.path_to_annots = self.path_to_frames / 'annotations' / self.annotation_type
 
     def transform(self, frame, is_vflip=False, is_hflip=False):
@@ -105,7 +106,7 @@ class CarradaDataset(Dataset):
     def __getitem__(self, idx):
         init_frame_name = self.dataset[idx][0]
         frame_id = int(init_frame_name)
-        frame_names = [str(f_id).zfill(6) for f_id in range(frame_id-self.n_frames+1, frame_id+1)]
+        frame_names = [str(f_id).zfill(6) for f_id in range(frame_id-(self.n_frames-1)*self.n_frame_stride, frame_id+1, self.n_frame_stride)]
         rd_matrices = list()
         ra_matrices = list()
         ad_matrices = list()

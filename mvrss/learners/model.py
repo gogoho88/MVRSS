@@ -52,6 +52,7 @@ class Model(nn.Module):
         self.custom_loss = self.cfg['custom_loss']
         self.comments = self.cfg['comments']
         self.n_frames = self.cfg['nb_input_channels']
+        self.n_frame_stride = self.cfg['nb_input_channel_stride']
         self.transform_names = self.cfg['transformations'].split(',')
         self.norm_type = self.cfg['norm_type']
         self.is_shuffled = self.cfg['shuffle']
@@ -104,7 +105,8 @@ class Model(nn.Module):
                                                              self.process_signal,
                                                              self.n_frames,
                                                              transformations,
-                                                             add_temp),
+                                                             add_temp,
+                                                             self.n_frame_stride),
                                               shuffle=self.is_shuffled,
                                               batch_size=self.batch_size,
                                               num_workers=4)
@@ -249,7 +251,7 @@ class Model(nn.Module):
         results_path = self.paths['results'] / 'results.json'
         model_path = self.paths['results'] / 'model.pt'
         with open(results_path, "w") as fp:
-            json.dump(self.results, fp)
+            json.dump(self.results, fp, indent=4)
         torch.save(self.net.state_dict(), model_path)
 
     def _set_seeds(self):

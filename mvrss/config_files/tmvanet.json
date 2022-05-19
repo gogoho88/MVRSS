@@ -6,6 +6,7 @@
  "h_size": 256,
  "nb_classes": 4,
  "nb_input_channels": 5,
+ "nb_input_channel_stride": 2,
  "nb_epochs": 300,
  "batch_size": 6,
  "lr": 0.0001,
