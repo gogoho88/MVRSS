@@ -111,4 +111,4 @@ venv.bak/
 .lprof
 
 # log
-/logs
+/logs/
