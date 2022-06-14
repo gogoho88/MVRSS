@@ -16,12 +16,13 @@ import numpy as np
 #     rad_temp = pickle.load(f)
 # end_time = time.time()-start_time
 
-path = '/workspace/Dataset/Carrada/Carrada'
-path_RAD = '/workspace/Dataset/Carrada_RAD'
+path = '/data/Carrada'
+path_RAD = '/data/datasets_master/Carrada_RAD'
 
 with open(os.path.join(path,'light_dataset_frame_oriented.json'), 'r') as fp:
     annotations = json.load(fp)
 
+#2D
 rdlist_mean = list()
 ralist_mean = list()
 adlist_mean = list()
@@ -34,10 +35,28 @@ adlist_min = list()
 rdlist_max = list()
 ralist_max = list()
 adlist_max = list()
+# 3D (RAD)
 radlist_mean = list()
 radlist_mean2 = list()
 radlist_min = list()
 radlist_max = list()
+# 3D (RAD_downsampled)
+radmodlist_mean = list()
+radmodlist_mean2 = list()
+radmodlist_min = list()
+radmodlist_max = list()
+radmod_rdlist_mean = list()
+radmod_ralist_mean = list()
+radmod_adlist_mean = list()
+radmod_rdlist_mean2 = list()
+radmod_ralist_mean2 = list()
+radmod_adlist_mean2 = list()
+radmod_rdlist_min = list()
+radmod_ralist_min = list()
+radmod_adlist_min = list()
+radmod_rdlist_max = list()
+radmod_ralist_max = list()
+radmod_adlist_max = list()
 
 ts = time.time()
 for sequence in annotations.keys():
@@ -70,6 +89,8 @@ for sequence in annotations.keys():
     print(sequence+'3D')
     for template in annotations[sequence]:
         rad_matrix = np.load(os.path.join(path_data_RAD,'RAD_numpy',template+'.npy'))
+        # Must be updated later ###
+        ###
 
         radlist_mean.append(rad_matrix.mean())
         radlist_mean2.append(np.mean(rad_matrix**2))
@@ -77,25 +98,57 @@ for sequence in annotations.keys():
         radlist_max.append(rad_matrix.max())
 te_3D = time.time()-ts
 
+ts = time.time()
+for sequence in annotations.keys():
+    path_data_RAD = os.path.join(path_RAD,sequence)
+
+    print(sequence+'3D_mod')
+    for template in annotations[sequence]:
+        rad_matrix_mod = np.load(os.path.join(path_data_RAD,'mod_RAD_numpy',template+'.npy'))
+        radmod_rd_matrix = rad_matrix_mod.mean(1)
+        radmod_ra_matrix = rad_matrix_mod.mean(2)
+        radmod_ad_matrix = rad_matrix_mod.mean(0)
+
+        radmodlist_mean.append(rad_matrix_mod.mean())
+        radmodlist_mean2.append(np.mean(rad_matrix_mod**2))
+        radmodlist_min.append(rad_matrix_mod.min())
+        radmodlist_max.append(rad_matrix_mod.max())
+        radmod_rdlist_mean.append(radmod_rd_matrix.mean())
+        radmod_ralist_mean.append(radmod_ra_matrix.mean())
+        radmod_adlist_mean.append(radmod_ad_matrix.mean())
+        radmod_rdlist_mean2.append(np.mean(radmod_rd_matrix**2))
+        radmod_ralist_mean2.append(np.mean(radmod_ra_matrix**2))
+        radmod_adlist_mean2.append(np.mean(radmod_ad_matrix**2))
+        radmod_rdlist_min.append(radmod_rd_matrix.min())
+        radmod_ralist_min.append(radmod_ra_matrix.min())
+        radmod_adlist_min.append(radmod_ad_matrix.min())
+        radmod_rdlist_max.append(radmod_rd_matrix.max())
+        radmod_ralist_max.append(radmod_ra_matrix.max())
+        radmod_adlist_max.append(radmod_ad_matrix.max())
+te_3D_mod = time.time()-ts
+
+
 # Save
 parameter = {}
-parameter['rd_stats_preprocessd'] = {
+parameter['2D'] = {
+            "rd_stats_preprocessd": {
                     "mean": float(np.array(rdlist_mean).mean()),
                     "std": float(np.sqrt(np.array(rdlist_mean2).mean()-np.array(rdlist_mean).mean()**2)),
                     "min_val": float(np.array(rdlist_min).min()),
                     "max_val": float(np.array(rdlist_max).max())
-}
-parameter['ra_stats_preprocessd'] = {
+                    },
+            "ra_stats_preprocessd": {
                     "mean": float(np.array(ralist_mean).mean()),
                     "std": float(np.sqrt(np.array(ralist_mean2).mean()-np.array(ralist_mean).mean()**2)),
                     "min_val": float(np.array(ralist_min).min()),
                     "max_val": float(np.array(ralist_max).max())
-}
-parameter['ad_stats_preprocessd'] = {
+                    },
+            "ad_stats_preprocessd": {
                     "mean": float(np.array(adlist_mean).mean()),
                     "std": float(np.sqrt(np.array(adlist_mean2).mean()-np.array(adlist_mean).mean()**2)),
                     "min_val": float(np.array(adlist_min).min()),
                     "max_val": float(np.array(adlist_max).max())
+                    }
 }
 parameter['rad_stats'] = {
                     "mean": float(np.array(radlist_mean).mean()),
@@ -103,13 +156,38 @@ parameter['rad_stats'] = {
                     "min_val": float(np.array(radlist_min).min()),
                     "max_val": float(np.array(radlist_max).max())
 }
-
+parameter['rad_mod_stats'] = {
+            "rad": {
+                    "mean": float(np.array(radmodlist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmodlist_mean2).mean()-np.array(radmodlist_mean).mean()**2)),
+                    "min_val": float(np.array(radmodlist_min).min()),
+                    "max_val": float(np.array(radmodlist_max).max())
+                    },
+            "rd_stats_preprocessd": {
+                    "mean": float(np.array(radmod_rdlist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod_rdlist_mean2).mean()-np.array(radmod_rdlist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod_rdlist_min).min()),
+                    "max_val": float(np.array(radmod_rdlist_max).max())
+                    },
+            "ra_stats_preprocessd": {
+                    "mean": float(np.array(radmod_ralist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod_ralist_mean2).mean()-np.array(radmod_ralist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod_ralist_min).min()),
+                    "max_val": float(np.array(radmod_ralist_max).max())
+                    },
+            "ad_stats_preprocessd": {
+                    "mean": float(np.array(radmod_adlist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod_adlist_mean2).mean()-np.array(radmod_adlist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod_adlist_min).min()),
+                    "max_val": float(np.array(radmod_adlist_max).max())
+                    }
+}
 
 save_path = "/workspace/MVRSS/mvrss/config_files/all_stats.json"
 with open(save_path, 'w') as f:
     json.dump(parameter, f, indent=4)
 
-        
+a = 1
         
 
 

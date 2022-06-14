@@ -51,18 +51,28 @@ class CarradaDataset(Dataset):
         Default: False
     """
 
-    def __init__(self, dataset, annotation_type, path_to_frames, process_signal,
+    def __init__(self, dataset, annotation_type, data_type, data_path, sequence_name, process_signal,
                  n_frames, transformations=None, add_temp=False, n_frame_stride=1):
         self.dataset = dataset
         self.annotation_type = annotation_type
-        self.path_to_frames = Path(path_to_frames)
+        self.data_type = data_type
         self.process_signal = process_signal
         self.n_frames = n_frames
         self.n_frame_stride = n_frame_stride
         self.transformations = transformations
         self.add_temp = add_temp
         self.dataset = self.dataset[(self.n_frames-1)*self.n_frame_stride::self.n_frame_stride]  # remove n*stride first frames
-        self.path_to_annots = self.path_to_frames / 'annotations' / self.annotation_type
+        if 'mod' in self.data_type:
+            self.path_to_annots = data_path / sequence_name / 'mod_annotations' / self.annotation_type
+        else:
+            self.path_to_annots = data_path / sequence_name / 'annotations' / self.annotation_type
+        if 'RAD' in self.data_type:
+            if 'mod' in self.data_type:
+                self.path_to_frames = data_path.parents[0] / 'datasets_master/Carrada_RAD' / sequence_name / 'mod_RAD_numpy'
+            else:
+                self.path_to_frames = data_path.parents[0] / 'datasets_master/Carrada_RAD' / sequence_name / 'RAD_numpy'
+        else:
+            self.path_to_frames = data_path / sequence_name
 
     def transform(self, frame, is_vflip=False, is_hflip=False):
         """
@@ -111,34 +121,45 @@ class CarradaDataset(Dataset):
         ra_matrices = list()
         ad_matrices = list()
         rd_mask = np.load(os.path.join(self.path_to_annots, init_frame_name,
-                                       'range_doppler.npy'))
+                                    'range_doppler.npy'))
         ra_mask = np.load(os.path.join(self.path_to_annots, init_frame_name,
-                                       'range_angle.npy'))
+                                    'range_angle.npy'))
+        ###############
+        if 'RAD' in self.data_type:
+            rd_mask = np.flip(rd_mask,1).copy()
+        ################    
         for frame_name in frame_names:
-            if self.process_signal:
-                rd_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'range_doppler_processed',
-                                                 frame_name + '.npy'))
-                ra_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'range_angle_processed',
-                                                 frame_name + '.npy'))
-                ad_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'angle_doppler_processed',
-                                                 frame_name + '.npy'))
+            if 'RAD' in self.data_type:
+                rad_matrix = np.load(os.path.join(self.path_to_frames,
+                                        frame_name + '.npy'))
+                rd_matrix = np.float64(rad_matrix.mean(1))
+                ra_matrix = np.float64(rad_matrix.mean(2))
+                ad_matrix = np.float64(rad_matrix.mean(0))
             else:
-                rd_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'range_doppler_raw',
-                                                 frame_name + '.npy'))
-                ra_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'range_angle_raw',
-                                                 frame_name + '.npy'))
-                ad_matrix = np.load(os.path.join(self.path_to_frames,
-                                                 'angle_doppler_raw',
-                                                 frame_name + '.npy'))
-
+                if self.process_signal:
+                    rd_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'range_doppler_processed',
+                                                    frame_name + '.npy'))
+                    ra_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'range_angle_processed',
+                                                    frame_name + '.npy'))
+                    ad_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'angle_doppler_processed',
+                                                    frame_name + '.npy'))
+                else:
+                    rd_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'range_doppler_raw',
+                                                    frame_name + '.npy'))
+                    ra_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'range_angle_raw',
+                                                    frame_name + '.npy'))
+                    ad_matrix = np.load(os.path.join(self.path_to_frames,
+                                                    'angle_doppler_raw',
+                                                    frame_name + '.npy'))
             rd_matrices.append(rd_matrix)
             ra_matrices.append(ra_matrix)
             ad_matrices.append(ad_matrix)
+
         # Apply the same transfo to all representations
         if np.random.uniform(0, 1) > 0.5:
             is_vflip = True

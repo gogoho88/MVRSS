@@ -4,7 +4,7 @@ import json
 from mvrss.utils.functions import count_params
 from mvrss.learners.initializer import Initializer
 from mvrss.learners.model import Model
-from mvrss.models import TMVANet, MVNet
+from mvrss.models import TMVANet, MVNet, RADnet_2D_downsample
 
 
 def main():
@@ -18,12 +18,17 @@ def main():
 
     init = Initializer(cfg)
     data = init.get_data()
-    if cfg['model'] == 'mvnet':
-        net = MVNet(n_classes=data['cfg']['nb_classes'],
-                    n_frames=data['cfg']['nb_input_channels'])
+    if 'RAD' in cfg['data_type']:
+        if 'mod' in cfg['data_type']:
+            net = RADnet_2D_downsample(n_classes=data['cfg']['nb_classes'],
+                                    n_frames=data['cfg']['nb_input_channels'])
     else:
-        net = TMVANet(n_classes=data['cfg']['nb_classes'],
-                      n_frames=data['cfg']['nb_input_channels'])
+        if cfg['model'] == 'mvnet':
+            net = MVNet(n_classes=data['cfg']['nb_classes'],
+                        n_frames=data['cfg']['nb_input_channels'])
+        else:
+            net = TMVANet(n_classes=data['cfg']['nb_classes'],
+                        n_frames=data['cfg']['nb_input_channels'])
 
     print('Number of trainable parameters in the model: %s' % str(count_params(net)))
 
