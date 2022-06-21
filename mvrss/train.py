@@ -4,7 +4,7 @@ import json
 from mvrss.utils.functions import count_params
 from mvrss.learners.initializer import Initializer
 from mvrss.learners.model import Model
-from mvrss.models import TMVANet, MVNet, RADnet_2D_downsample
+from mvrss.models import TMVANet, MVNet, RADnet_2D_downsample, RADnet_2D_downsample2
 
 
 def main():
@@ -20,8 +20,12 @@ def main():
     data = init.get_data()
     if 'RAD' in cfg['data_type']:
         if 'mod' in cfg['data_type']:
-            net = RADnet_2D_downsample(n_classes=data['cfg']['nb_classes'],
-                                    n_frames=data['cfg']['nb_input_channels'])
+            if cfg['data_type']=='RAD_mod':      # for 128x128x32 RAD tensor (parallel mode)
+                net = RADnet_2D_downsample(n_classes=data['cfg']['nb_classes'],
+                                        n_frames=data['cfg']['nb_input_channels'])
+            elif cfg['data_type']=='RAD_mod2':   # for 64x64x32 RAD tensor (parallel mode)
+                net = RADnet_2D_downsample2(n_classes=data['cfg']['nb_classes'],
+                                        n_frames=data['cfg']['nb_input_channels'])
     else:
         if cfg['model'] == 'mvnet':
             net = MVNet(n_classes=data['cfg']['nb_classes'],

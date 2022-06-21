@@ -63,12 +63,12 @@ class CarradaDataset(Dataset):
         self.add_temp = add_temp
         self.dataset = self.dataset[(self.n_frames-1)*self.n_frame_stride::self.n_frame_stride]  # remove n*stride first frames
         if 'mod' in self.data_type:
-            self.path_to_annots = data_path / sequence_name / 'mod_annotations' / self.annotation_type
+            self.path_to_annots = data_path / sequence_name / f"{self.data_type.split('_')[-1]}_annotations" / self.annotation_type
         else:
             self.path_to_annots = data_path / sequence_name / 'annotations' / self.annotation_type
         if 'RAD' in self.data_type:
             if 'mod' in self.data_type:
-                self.path_to_frames = data_path.parents[0] / 'datasets_master/Carrada_RAD' / sequence_name / 'mod_RAD_numpy'
+                self.path_to_frames = data_path.parents[0] / 'datasets_master/Carrada_RAD' / sequence_name / f"{self.data_type.split('_')[-1]}_RAD_numpy"
             else:
                 self.path_to_frames = data_path.parents[0] / 'datasets_master/Carrada_RAD' / sequence_name / 'RAD_numpy'
         else:

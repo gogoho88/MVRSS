@@ -117,7 +117,7 @@ def normalize(data, signal_type, norm_type='local', data_type=''):
             stats = json.load(fp)
         if 'RAD' in data_type:
             if 'mod' in data_type:
-                stats = stats['rad_mod_stats']
+                stats = stats['rad_'+data_type.split('_')[-1]+'_stats']
             else:
                 stats = stats['rad_stats']
         else:

@@ -57,7 +57,23 @@ radmod_adlist_min = list()
 radmod_rdlist_max = list()
 radmod_ralist_max = list()
 radmod_adlist_max = list()
-
+# 3D (RAD_downsampled2)
+radmod2list_mean = list()
+radmod2list_mean2 = list()
+radmod2list_min = list()
+radmod2list_max = list()
+radmod2_rdlist_mean = list()
+radmod2_ralist_mean = list()
+radmod2_adlist_mean = list()
+radmod2_rdlist_mean2 = list()
+radmod2_ralist_mean2 = list()
+radmod2_adlist_mean2 = list()
+radmod2_rdlist_min = list()
+radmod2_ralist_min = list()
+radmod2_adlist_min = list()
+radmod2_rdlist_max = list()
+radmod2_ralist_max = list()
+radmod2_adlist_max = list()
 ts = time.time()
 for sequence in annotations.keys():
     path_data = os.path.join(path,sequence)
@@ -127,6 +143,34 @@ for sequence in annotations.keys():
         radmod_adlist_max.append(radmod_ad_matrix.max())
 te_3D_mod = time.time()-ts
 
+ts = time.time()
+for sequence in annotations.keys():
+    path_data_RAD = os.path.join(path_RAD,sequence)
+
+    print(sequence+'3D_mod')
+    for template in annotations[sequence]:
+        rad_matrix_mod = np.load(os.path.join(path_data_RAD,'mod2_RAD_numpy',template+'.npy'))
+        radmod_rd_matrix = rad_matrix_mod.mean(1)
+        radmod_ra_matrix = rad_matrix_mod.mean(2)
+        radmod_ad_matrix = rad_matrix_mod.mean(0)
+
+        radmod2list_mean.append(rad_matrix_mod.mean())
+        radmod2list_mean2.append(np.mean(rad_matrix_mod**2))
+        radmod2list_min.append(rad_matrix_mod.min())
+        radmod2list_max.append(rad_matrix_mod.max())
+        radmod2_rdlist_mean.append(radmod_rd_matrix.mean())
+        radmod2_ralist_mean.append(radmod_ra_matrix.mean())
+        radmod2_adlist_mean.append(radmod_ad_matrix.mean())
+        radmod2_rdlist_mean2.append(np.mean(radmod_rd_matrix**2))
+        radmod2_ralist_mean2.append(np.mean(radmod_ra_matrix**2))
+        radmod2_adlist_mean2.append(np.mean(radmod_ad_matrix**2))
+        radmod2_rdlist_min.append(radmod_rd_matrix.min())
+        radmod2_ralist_min.append(radmod_ra_matrix.min())
+        radmod2_adlist_min.append(radmod_ad_matrix.min())
+        radmod2_rdlist_max.append(radmod_rd_matrix.max())
+        radmod2_ralist_max.append(radmod_ra_matrix.max())
+        radmod2_adlist_max.append(radmod_ad_matrix.max())
+te_3D_mod2 = time.time()-ts
 
 # Save
 parameter = {}
@@ -182,7 +226,32 @@ parameter['rad_mod_stats'] = {
                     "max_val": float(np.array(radmod_adlist_max).max())
                     }
 }
-
+parameter['rad_mod2_stats'] = {
+            "rad": {
+                    "mean": float(np.array(radmod2list_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod2list_mean2).mean()-np.array(radmod2list_mean).mean()**2)),
+                    "min_val": float(np.array(radmod2list_min).min()),
+                    "max_val": float(np.array(radmod2list_max).max())
+                    },
+            "rd_stats_preprocessd": {
+                    "mean": float(np.array(radmod2_rdlist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod2_rdlist_mean2).mean()-np.array(radmod2_rdlist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod2_rdlist_min).min()),
+                    "max_val": float(np.array(radmod2_rdlist_max).max())
+                    },
+            "ra_stats_preprocessd": {
+                    "mean": float(np.array(radmod2_ralist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod2_ralist_mean2).mean()-np.array(radmod2_ralist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod2_ralist_min).min()),
+                    "max_val": float(np.array(radmod2_ralist_max).max())
+                    },
+            "ad_stats_preprocessd": {
+                    "mean": float(np.array(radmod2_adlist_mean).mean()),
+                    "std": float(np.sqrt(np.array(radmod2_adlist_mean2).mean()-np.array(radmod2_adlist_mean).mean()**2)),
+                    "min_val": float(np.array(radmod2_adlist_min).min()),
+                    "max_val": float(np.array(radmod2_adlist_max).max())
+                    }
+}
 save_path = "/workspace/MVRSS/mvrss/config_files/all_stats.json"
 with open(save_path, 'w') as f:
     json.dump(parameter, f, indent=4)

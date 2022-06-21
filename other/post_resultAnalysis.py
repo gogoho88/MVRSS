@@ -2,8 +2,8 @@ import os
 import json
 import numpy as np
 
-path1 = '/workspace/MVRSS/logs/carrada/tmvanet/tmvanet_e300_lr0.0001_s42_2'
-path2 = '/workspace/MVRSS/logs/carrada/tmvanet/tmvanet_e300_lr0.0001_s42_4'
+path1 = '/workspace/MVRSS/logs/carrada/tmvanet/tmvanet_e300_lr0.0001_s42_3'
+path2 = '/workspace/MVRSS/logs/carrada/tmvanet/tmvanet_e600_lr0.0001_s42_0'
 result_path1 = os.path.join(path1,'results','results.json')
 result_path2 = os.path.join(path2,'results','results.json')
 config_path1 = os.path.join(path1,'config.json')
