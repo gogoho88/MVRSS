@@ -111,4 +111,5 @@ venv.bak/
 .lprof
 
 # log
-/logs
+/logs/
+JH.txt

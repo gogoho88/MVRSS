@@ -85,7 +85,7 @@ def get_metrics(metrics, loss, losses=None):
     return metrics_values
 
 
-def normalize(data, signal_type, norm_type='local'):
+def normalize(data, signal_type, norm_type='local', data_type=''):
     """
     Method to normalise the radar views
 
@@ -115,6 +115,13 @@ def normalize(data, signal_type, norm_type='local'):
         file_path = MVRSS_HOME / 'config_files' / 'all_stats.json'
         with open(file_path, 'r') as fp:
             stats = json.load(fp)
+        if 'RAD' in data_type:
+            if 'mod' in data_type:
+                stats = stats['rad_'+data_type.split('_')[-1]+'_stats']
+            else:
+                stats = stats['rad_stats']
+        else:
+            stats = stats['2D']
         if 'Znorm' in norm_type:
             if signal_type == 'range_doppler':
                 mean_value = torch.tensor(stats['rd_stats_preprocessd']['mean'])

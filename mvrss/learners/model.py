@@ -55,6 +55,7 @@ class Model(nn.Module):
         self.n_frame_stride = self.cfg['nb_input_channel_stride']
         self.transform_names = self.cfg['transformations'].split(',')
         self.norm_type = self.cfg['norm_type']
+        self.data_type = self.cfg['data_type']
         self.is_shuffled = self.cfg['shuffle']
         self.writer = SummaryWriter(self.paths['writer'])
         self.visualizer = TensorboardMultiLossVisualizer(self.writer)
@@ -101,7 +102,9 @@ class Model(nn.Module):
                 path_to_frames = os.path.join(self.paths['carrada'], seq_name[0])
                 frame_dataloader = DataLoader(CarradaDataset(seq,
                                                              self.annot_type,
-                                                             path_to_frames,
+                                                             self.data_type,
+                                                             self.paths['carrada'],
+                                                             seq_name[0],
                                                              self.process_signal,
                                                              self.n_frames,
                                                              transformations,
@@ -116,10 +119,10 @@ class Model(nn.Module):
                     ad_data = frame['ad_matrix'].to(self.device).float()
                     rd_mask = frame['rd_mask'].to(self.device).float()
                     ra_mask = frame['ra_mask'].to(self.device).float()
-                    rd_data = normalize(rd_data, 'range_doppler', norm_type=self.norm_type)
-                    ra_data = normalize(ra_data, 'range_angle', norm_type=self.norm_type)
+                    rd_data = normalize(rd_data, 'range_doppler', norm_type=self.norm_type, data_type=self.data_type)
+                    ra_data = normalize(ra_data, 'range_angle', norm_type=self.norm_type, data_type =self.data_type)
                     if self.model_name == 'tmvanet':
-                        ad_data = normalize(ad_data, 'angle_doppler', norm_type=self.norm_type)
+                        ad_data = normalize(ad_data, 'angle_doppler', norm_type=self.norm_type, data_type=self.data_type)
                     optimizer.zero_grad()
 
                     if self.model_name == 'tmvanet':
