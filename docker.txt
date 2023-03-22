@@ -1,0 +1,2 @@
+nvidia-docker run -it -p 2450:8888 --shm-size=8g --name Proj_Auto_compare_MVRSS -v ~/Research/Proj_Radar_Autonomous/compare_MVRSS_ICCV21/:/workspace -v ~/NAS/Drive/JaeHoChoi/Data/AutonomousRadar/CarradaDataset/:/data gogoho88/image_proj_au
+to_mvrss_private:1.0.0
